@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
+<meta name="googlebot" content="noindex, nofollow">
+<title>MEMORIES — Album Kỷ Niệm</title>
+<meta http-equiv="X-Frame-Options" content="DENY">
+<meta http-equiv="Content-Security-Policy" content="frame-ancestors 'none'">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Nunito:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --sky1:#1a6fb5;--sky2:#2e9cde;--sky3:#6dc8f5;--sky4:#b8e8ff;--sky5:#dff3ff;
+  --white:#ffffff;--cream:#f8fbff;
+  --text:#0d2340;--muted:rgba(13,35,64,0.55);--faint:rgba(13,35,64,0.35);
+  --gold:#e8a020;--gold2:#f5c84a;--golddim:rgba(232,160,32,0.15);
+  --teal:#0891b2;--rose:#e05580;
+  --card-bg:rgba(255,255,255,0.72);--card-border:rgba(255,255,255,0.9);
+  --shadow:rgba(13,35,64,0.12);
+}
+html{-webkit-font-smoothing:antialiased;scroll-behavior:smooth}
+body{
+  background:var(--sky1);
+  color:var(--text);
+  font-family:'Nunito',sans-serif;
+  font-weight:400;
+  min-height:100vh;
+  overflow-x:hidden;
+}
+
+/* ═══════════════════════════
+   SKY CANVAS BG
+═══════════════════════════ */
+#sky-canvas{position:fixed;inset:0;z-index:0;width:100%;height:100%;pointer-events:none}
+#sun-glow{
+  position:fixed;
+  width:280px;height:280px;
+  top:-80px;right:8%;
+  background:radial-gradient(circle,rgba(255,240,180,0.55) 0%,rgba(255,210,80,0.18) 40%,transparent 70%);
+  border-radius:50%;
+  z-index:1;pointer-events:none;
+  animation:sun-pulse 8s ease-in-out infinite;
+}
+@keyframes sun-pulse{0%,100%{transform:scale(1);opacity:.8}50%{transform:scale(1.08);opacity:1}}
+#vignette{position:fixed;inset:0;z-index:2;pointer-events:none;
+  background:radial-gradient(ellipse 110% 110% at 50% 0%,transparent 55%,rgba(13,35,64,0.08) 100%)}
+#scan{position:fixed;inset:0;z-index:2;pointer-events:none;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(255,255,255,.008) 2px,rgba(255,255,255,.008) 4px)}
+/* birds */
+.bird{position:fixed;font-size:var(--s,14px);opacity:.55;z-index:3;pointer-events:none;
+  animation:fly var(--d,22s) var(--dl,0s) linear infinite}
+@keyframes fly{from{transform:translateX(-120px) translateY(var(--sy,0px))}to{transform:translateX(calc(100vw + 120px)) translateY(var(--ey,0px))}}
+
+/* ═══════════════════════════
+   PASSWORD
+═══════════════════════════ */
+#pw-screen{
+  position:fixed;inset:0;z-index:50000;
+  display:flex;align-items:center;justify-content:center;
+  flex-direction:column;text-align:center;padding:24px;
+  background:linear-gradient(160deg,#1a6fb5 0%,#2e9cde 40%,#6dc8f5 100%);
+}
+.pw-cloud{position:absolute;border-radius:50%;background:rgba(255,255,255,0.18);filter:blur(40px);pointer-events:none}
+.pw-c1{width:400px;height:200px;top:-60px;left:-80px}
+.pw-c2{width:300px;height:180px;bottom:20px;right:-60px}
+.pw-logo-wrap{position:relative;z-index:1;margin-bottom:40px}
+.pw-logo{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(3.5rem,10vw,6.5rem);
+  font-weight:300;color:white;
+  letter-spacing:-.01em;line-height:1;
+  text-shadow:0 4px 24px rgba(13,35,64,0.25);
+}
+.pw-logo em{font-style:italic;color:var(--gold2)}
+.pw-tagline{font-size:12px;letter-spacing:.3em;text-transform:uppercase;color:rgba(255,255,255,0.7);margin-top:8px}
+.pw-card{
+  position:relative;z-index:1;
+  background:rgba(255,255,255,0.92);
+  border-radius:20px;
+  padding:36px 40px;
+  max-width:380px;width:100%;
+  box-shadow:0 20px 60px rgba(13,35,64,0.2),0 0 0 1px rgba(255,255,255,0.8);
+  backdrop-filter:blur(20px);
+}
+.pw-label{font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--teal);margin-bottom:16px}
+.pw-input{
+  width:100%;background:rgba(13,35,64,0.05);
+  border:1.5px solid rgba(13,35,64,0.15);border-radius:12px;
+  color:var(--text);font-family:'Nunito',sans-serif;font-size:18px;
+  font-weight:400;padding:14px 18px;letter-spacing:.15em;
+  text-align:center;outline:none;transition:border-color .25s,box-shadow .25s;
+  margin-bottom:14px;
+}
+.pw-input:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(8,145,178,0.12)}
+.pw-btn{
+  width:100%;padding:15px;border:none;border-radius:12px;
+  background:linear-gradient(135deg,var(--sky1),var(--teal));
+  color:white;font-family:'Nunito',sans-serif;font-size:13px;
+  font-weight:600;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;
+  box-shadow:0 6px 20px rgba(8,145,178,0.35);
+  transition:transform .2s,box-shadow .2s;
+}
+.pw-btn:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(8,145,178,0.45)}
+.pw-err{color:var(--rose);font-size:12px;margin-top:10px;min-height:18px;font-weight:500}
+.pw-shake{animation:shake .4s ease}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+
+/* ═══════════════════════════
+   APP LAYOUT
+═══════════════════════════ */
+#app{position:relative;z-index:10;display:none}
+
+/* ── TOPNAV ── */
+.topnav{
+  position:sticky;top:0;z-index:100;
+  display:flex;align-items:center;gap:12px;
+  padding:12px 28px;
+  background:rgba(255,255,255,0.75);
+  backdrop-filter:blur(24px);
+  border-bottom:1px solid rgba(255,255,255,0.9);
+  box-shadow:0 2px 20px rgba(13,35,64,0.08);
+  flex-wrap:wrap;
+}
+.nav-brand{
+  font-family:'Cormorant Garamond',serif;
+  font-size:1.5rem;font-weight:400;
+  color:var(--sky1);letter-spacing:.02em;margin-right:auto;
+}
+.nav-brand em{font-style:italic;color:var(--gold)}
+.nav-btn{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:8px 16px;border-radius:20px;
+  background:rgba(13,35,64,0.06);border:1.5px solid rgba(13,35,64,0.1);
+  color:var(--muted);font-family:'Nunito',sans-serif;font-size:11px;
+  font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;
+  transition:all .2s;position:relative;
+}
+.nav-btn:hover{background:rgba(8,145,178,0.1);border-color:var(--teal);color:var(--teal)}
+.nav-btn.primary{background:linear-gradient(135deg,var(--sky1),var(--teal));border-color:transparent;color:white;box-shadow:0 4px 14px rgba(8,145,178,0.3)}
+.nav-btn.primary:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(8,145,178,0.4)}
+.nav-btn input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.nav-btn.danger:hover{background:rgba(224,85,128,0.1);border-color:var(--rose);color:var(--rose)}
+.nav-sep{width:1px;height:24px;background:rgba(13,35,64,0.1)}
+
+/* ── TABS ── */
+.tab-bar{
+  display:flex;align-items:center;gap:4px;
+  padding:0 28px;
+  background:rgba(255,255,255,0.6);
+  backdrop-filter:blur(16px);
+  border-bottom:1px solid rgba(255,255,255,0.8);
+  overflow-x:auto;scrollbar-width:none;
+}
+.tab-bar::-webkit-scrollbar{display:none}
+.tab-item{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:14px 18px;
+  background:none;border:none;border-bottom:2.5px solid transparent;
+  color:var(--muted);font-family:'Nunito',sans-serif;font-size:12px;
+  font-weight:600;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;
+  transition:color .2s,border-color .2s;white-space:nowrap;margin-bottom:-1px;
+}
+.tab-item:hover{color:var(--text)}
+.tab-item.on{color:var(--sky1);border-bottom-color:var(--sky1)}
+.t-badge{
+  display:inline-flex;align-items:center;justify-content:center;
+  min-width:20px;height:18px;padding:0 6px;
+  background:rgba(8,145,178,0.12);border-radius:9px;
+  font-size:10px;color:var(--teal);font-weight:600;letter-spacing:0;
+}
+.tab-item:not(.on) .t-badge{background:rgba(13,35,64,0.07);color:var(--faint)}
+.tab-stats{margin-left:auto;font-size:11px;color:var(--faint);padding:14px 4px;white-space:nowrap}
+.tab-stats b{color:var(--sky1);font-weight:600}
+.view-btns{display:flex;gap:2px}
+.vb{padding:6px 10px;background:none;border:1.5px solid rgba(13,35,64,0.1);
+  border-radius:6px;color:var(--muted);font-size:13px;cursor:pointer;
+  transition:all .2s}
+.vb.on{background:rgba(8,145,178,0.1);border-color:var(--teal);color:var(--teal)}
+.vb:hover:not(.on){background:rgba(13,35,64,0.06)}
+
+/* ── HERO ── */
+.hero{
+  min-height:92vh;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  text-align:center;
+  padding:80px 24px 60px;
+  position:relative;
+}
+.hero-content{position:relative;z-index:1}
+.hero-kv{
+  display:inline-block;
+  background:rgba(255,255,255,0.3);
+  backdrop-filter:blur(12px);
+  border:1px solid rgba(255,255,255,0.7);
+  border-radius:30px;
+  padding:6px 20px;
+  font-size:11px;font-weight:600;letter-spacing:.3em;text-transform:uppercase;
+  color:white;
+  margin-bottom:28px;
+  box-shadow:0 4px 16px rgba(13,35,64,0.1);
+}
+.hero-title{
+  font-family:'Cormorant Garamond',serif;
+  font-weight:300;
+  line-height:.88;
+  margin-bottom:20px;
+}
+.ht-sm{display:block;font-size:clamp(1rem,2.8vw,1.8rem);font-style:italic;
+  color:rgba(255,255,255,0.8);letter-spacing:.06em;margin-bottom:6px}
+.ht-lg{
+  display:block;
+  font-size:clamp(4rem,13vw,10rem);
+  color:white;
+  text-shadow:0 6px 40px rgba(13,35,64,0.2),0 2px 8px rgba(13,35,64,0.15);
+  letter-spacing:-.02em;
+}
+.ht-sub{display:block;font-size:clamp(.85rem,2vw,1.2rem);letter-spacing:.22em;
+  color:rgba(255,255,255,0.65);margin-top:10px;text-transform:uppercase;font-weight:300}
+.hero-desc{
+  font-size:14px;font-weight:400;color:rgba(255,255,255,0.7);
+  line-height:1.9;max-width:420px;margin:0 auto 36px;letter-spacing:.02em;
+}
+/* Hero upload (admin) */
+.hero-upload{
+  position:relative;display:inline-flex;align-items:center;gap:10px;
+  padding:16px 36px;border-radius:30px;border:none;
+  background:white;
+  color:var(--sky1);font-family:'Nunito',sans-serif;font-size:13px;
+  font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;
+  box-shadow:0 8px 30px rgba(13,35,64,0.2);
+  transition:transform .25s,box-shadow .25s;
+}
+.hero-upload:hover{transform:translateY(-3px);box-shadow:0 14px 40px rgba(13,35,64,0.25)}
+.hero-upload input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+/* Floating clouds decoration */
+.hero-cloud{
+  position:absolute;background:rgba(255,255,255,0.35);
+  border-radius:50%;filter:blur(30px);pointer-events:none;
+  animation:hcloud var(--hd,18s) ease-in-out infinite;
+}
+@keyframes hcloud{0%,100%{transform:translateX(0) scale(1)}50%{transform:translateX(var(--hx,30px)) scale(1.04)}}
+.scroll-hint{
+  position:absolute;bottom:28px;left:50%;transform:translateX(-50%);
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  font-size:9px;letter-spacing:.3em;text-transform:uppercase;
+  color:rgba(255,255,255,0.45);
+}
+.scroll-line{width:1px;height:24px;background:linear-gradient(to bottom,rgba(255,255,255,.5),transparent)}
+
+/* ── GALLERY WRAPPER ── */
+#gallery-section{
+  background:linear-gradient(to bottom,rgba(255,255,255,0) 0%,rgba(240,248,255,0.85) 60px);
+  min-height:100vh;
+  padding-bottom:80px;
+}
+
+/* ── MASONRY ── */
+.masonry-wrap{
+  max-width:1600px;margin:0 auto;
+  padding:24px 20px 0;
+}
+/* 5-col masonry */
+.masonry{columns:5;column-gap:14px}
+@media(max-width:1400px){.masonry{columns:4}}
+@media(max-width:1000px){.masonry{columns:3}}
+@media(max-width:640px){.masonry{columns:2}}
+@media(max-width:380px){.masonry{columns:1}}
+/* grid view */
+.grid-view{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
+
+/* ── MEDIA CARD ── */
+.card{
+  break-inside:avoid;
+  margin-bottom:14px;
+  position:relative;
+  border-radius:16px;
+  overflow:hidden;
+  background:var(--card-bg);
+  border:1.5px solid var(--card-border);
+  cursor:pointer;
+  box-shadow:0 4px 16px var(--shadow);
+  animation:cin .4s ease both;
+  transition:transform .35s cubic-bezier(.4,0,.2,1),box-shadow .35s;
+  backdrop-filter:blur(8px);
+}
+.card:hover{
+  transform:translateY(-6px) scale(1.012);
+  box-shadow:0 18px 50px rgba(13,35,64,0.18),0 0 0 2px rgba(255,255,255,0.9);
+  z-index:2;
+}
+@keyframes cin{from{opacity:0;transform:translateY(16px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+.card img{display:block;width:100%;height:auto;transition:transform .45s cubic-bezier(.4,0,.2,1),filter .3s}
+.card:hover img{transform:scale(1.04);filter:brightness(1.04) saturate(1.1)}
+/* video card */
+.card.is-vid::after{
+  content:'▶';position:absolute;top:10px;left:10px;
+  width:28px;height:24px;
+  background:rgba(13,35,64,0.7);
+  border:1.5px solid rgba(255,255,255,0.7);
+  border-radius:6px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:9px;color:white;
+  backdrop-filter:blur(6px);z-index:3;padding-left:2px;line-height:1;
+}
+.vid-thumb-wrap{position:relative;overflow:hidden;border-radius:14px 14px 0 0;min-height:120px;background:#c8e8f8}
+.vid-placeholder{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  width:100%;min-height:140px;padding:20px 12px;gap:10px;
+  background:linear-gradient(135deg,#b8ddf5,#dff3ff);
+}
+.vid-placeholder svg{opacity:.5}
+.vid-placeholder span{font-size:11px;color:var(--muted);text-align:center;line-height:1.5;word-break:break-word;max-width:100%}
+.vid-play-icon{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;transition:transform .25s}
+.card:hover .vid-play-icon{transform:translate(-50%,-50%) scale(1.2)}
+/* card hover overlay */
+.c-ov{
+  position:absolute;inset:0;opacity:0;transition:opacity .3s;
+  background:linear-gradient(to top,rgba(13,35,64,0.7) 0%,rgba(13,35,64,0.15) 40%,transparent 65%);
+  display:flex;flex-direction:column;justify-content:flex-end;
+  padding:14px;border-radius:16px;
+}
+.card:hover .c-ov{opacity:1}
+.c-name{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:.88rem;color:white;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.c-date{font-size:9px;color:rgba(255,255,255,0.7);letter-spacing:.08em;text-transform:uppercase;margin-top:2px}
+/* card caption below image */
+.c-caption{padding:10px 12px 12px;background:rgba(255,255,255,0.6)}
+.c-cap-name{font-size:12px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.c-cap-date{font-size:10px;color:var(--muted);margin-top:2px}
+/* delete btn */
+.c-top{position:absolute;top:0;left:0;right:0;display:flex;justify-content:flex-end;padding:8px;opacity:0;transition:opacity .2s;z-index:4}
+.card:hover .c-top{opacity:1}
+.c-del{width:28px;height:28px;background:rgba(255,255,255,0.9);border:1.5px solid rgba(13,35,64,0.1);border-radius:8px;color:var(--muted);display:flex;align-items:center;justify-content:center;font-size:11px;cursor:pointer;transition:all .2s;box-shadow:0 2px 8px rgba(13,35,64,0.1)}
+.c-del:hover{color:var(--rose);border-color:var(--rose);background:rgba(224,85,128,0.1)}
+/* empty */
+.empty{grid-column:1/-1;column-span:all;text-align:center;padding:80px 24px}
+.empty-icon{font-size:3.5rem;margin-bottom:16px;opacity:.3}
+.empty h3{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:300;font-style:italic;color:var(--muted);margin-bottom:6px}
+.empty p{font-size:12px;color:var(--faint);letter-spacing:.06em}
+
+/* ── LOADING ── */
+#loading{text-align:center;padding:60px 24px;display:none}
+.spin{width:36px;height:36px;border:2.5px solid rgba(8,145,178,.15);border-top-color:var(--teal);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 14px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.load-txt{font-size:12px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted)}
+
+/* ── DROP ZONE ── */
+#dz{position:fixed;inset:0;z-index:60000;opacity:0;pointer-events:none;transition:opacity .2s;display:flex;align-items:center;justify-content:center;
+  background:rgba(26,111,181,0.88);backdrop-filter:blur(12px)}
+#dz.show{opacity:1}
+.dz-inner{text-align:center;animation:dzf .7s ease-in-out infinite alternate}
+@keyframes dzf{from{transform:translateY(-10px)}to{transform:translateY(10px)}}
+.dz-ring{width:100px;height:100px;margin:0 auto 22px;border-radius:50%;border:2px dashed rgba(255,255,255,0.6);display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.1)}
+.dz-title{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:clamp(2rem,5vw,3.2rem);color:white;text-shadow:0 4px 20px rgba(13,35,64,0.2);margin-bottom:8px}
+.dz-sub{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,0.65)}
+.dz-border{position:absolute;inset:20px;border-radius:20px;border:2px dashed rgba(255,255,255,0.3);pointer-events:none}
+
+/* ── PROGRESS ── */
+#prog{position:fixed;top:0;left:0;height:3px;width:0%;z-index:9999;
+  background:linear-gradient(90deg,var(--sky2),var(--gold2),var(--teal));
+  box-shadow:0 0 10px rgba(45,156,222,.6);transition:width .15s linear}
+
+/* ── LIGHTBOX ── */
+#lb{display:none;position:fixed;inset:0;z-index:10000;
+  background:rgba(5,18,38,0.96);backdrop-filter:blur(28px);
+  flex-direction:column;align-items:center;justify-content:center}
+#lb.open{display:flex}
+.lb-top{position:absolute;top:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:16px 22px;
+  background:linear-gradient(to bottom,rgba(5,18,38,.85),transparent);z-index:2}
+.lb-counter{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,0.4)}
+.lb-counter b{color:var(--gold2);font-weight:600}
+.lb-close{background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:8px;padding:7px 14px;color:rgba(255,255,255,0.6);font-size:10px;letter-spacing:.18em;text-transform:uppercase;cursor:pointer;transition:all .2s}
+.lb-close:hover{background:rgba(255,255,255,0.18);color:white}
+.lb-main{position:relative;max-width:min(90vw,1300px);max-height:76vh;animation:lbz .25s ease}
+@keyframes lbz{from{opacity:0;transform:scale(.97)}to{opacity:1;transform:scale(1)}}
+.lb-main img{display:block;max-width:100%;max-height:76vh;object-fit:contain;border-radius:10px;box-shadow:0 0 80px rgba(0,0,0,.8)}
+.lb-main video{display:block;max-width:100%;max-height:76vh;border-radius:10px;box-shadow:0 0 80px rgba(0,0,0,.8);background:#000}
+.lb-main iframe{width:min(90vw,960px);height:min(54vw,540px);border:none;border-radius:10px}
+.lb-info{margin-top:16px;text-align:center}
+.lb-n{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1.1rem;color:rgba(255,255,255,.85)}
+.lb-d{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-top:3px}
+.lb-actions{margin-top:10px;display:flex;gap:8px;justify-content:center}
+.lb-action{display:inline-flex;align-items:center;gap:5px;padding:6px 14px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:8px;color:rgba(255,255,255,.55);font-size:10px;letter-spacing:.12em;text-transform:uppercase;text-decoration:none;cursor:pointer;transition:all .2s}
+.lb-action:hover{background:rgba(255,255,255,0.15);color:white}
+.lb-nav{position:fixed;top:50%;transform:translateY(-50%);background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:10px;width:44px;height:66px;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.5);font-size:22px;cursor:pointer;backdrop-filter:blur(10px);transition:all .2s}
+.lb-nav:hover{background:rgba(255,255,255,0.18);color:white}
+#lbn-p{left:14px}#lbn-n{right:14px}
+.lb-strip{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);display:flex;gap:5px;max-width:70vw;overflow-x:auto;scrollbar-width:none;padding:2px}
+.lb-strip::-webkit-scrollbar{display:none}
+.lbt{width:42px;height:30px;object-fit:cover;border:2px solid transparent;border-radius:5px;cursor:pointer;opacity:.35;transition:all .2s;flex-shrink:0}
+.lbt.on{opacity:1;border-color:var(--gold2)}
+.lbt:hover{opacity:.7}
+
+/* ── TOAST ── */
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(70px);opacity:0;
+  background:rgba(255,255,255,0.95);border:1.5px solid rgba(13,35,64,0.1);border-radius:12px;
+  padding:11px 24px;font-size:12px;font-weight:500;color:var(--text);z-index:99000;
+  transition:transform .4s cubic-bezier(.4,0,.2,1),opacity .4s;white-space:nowrap;
+  backdrop-filter:blur(20px);box-shadow:0 8px 30px rgba(13,35,64,0.12)}
+#toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+.tok{color:var(--teal)}.terr{color:var(--rose)}.thi{color:var(--sky1)}
+
+footer{text-align:center;padding:32px 24px 48px;
+  background:rgba(255,255,255,0.4);backdrop-filter:blur(10px);
+  border-top:1px solid rgba(255,255,255,0.6);
+  font-size:10px;letter-spacing:.25em;text-transform:uppercase;color:var(--faint)}
+</style>
+</head>
+<body>
+
+<!-- SKY BG -->
+<canvas id="sky-canvas"></canvas>
+<div id="sun-glow"></div>
+<div id="vignette"></div>
+<div id="scan"></div>
+<!-- Birds -->
+<div class="bird" style="top:18%;--s:16px;--d:28s;--dl:0s;--sy:0px;--ey:-40px">🐦</div>
+<div class="bird" style="top:14%;--s:12px;--d:35s;--dl:-8s;--sy:0px;--ey:30px">🐦</div>
+<div class="bird" style="top:22%;--s:10px;--d:42s;--dl:-18s;--sy:0px;--ey:-20px">🐦</div>
+<div class="bird" style="top:10%;--s:14px;--d:31s;--dl:-24s;--sy:0px;--ey:50px">🐦</div>
+<div id="prog"></div>
+
+<!-- PASSWORD -->
+<div id="pw-screen">
+  <div class="pw-cloud pw-c1"></div>
+  <div class="pw-cloud pw-c2"></div>
+  <div class="pw-logo-wrap">
+    <div class="pw-logo">MEM<em>O</em>RIES</div>
+    <div class="pw-tagline">Album Kỷ Niệm Cá Nhân</div>
+  </div>
+  <div class="pw-card">
+    <div class="pw-label">🔒 Nhập mật khẩu</div>
+    <input class="pw-input" id="pw-input" type="password" placeholder="••••••••" maxlength="32">
+    <button class="pw-btn" onclick="checkPw()">Vào album →</button>
+    <div class="pw-err" id="pw-err"></div>
+  </div>
+</div>
+
+<!-- DROP ZONE -->
+<div id="dz">
+  <div class="dz-border"></div>
+  <div class="dz-inner">
+    <div class="dz-ring">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.3"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+    </div>
+    <div class="dz-title">Thả ảnh &amp; video</div>
+    <div class="dz-sub">Thả để upload lên Google Drive</div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-cloud" style="width:500px;height:220px;top:-60px;left:-120px;--hd:22s;--hx:40px"></div>
+    <div class="hero-cloud" style="width:380px;height:180px;bottom:60px;right:-80px;--hd:17s;--hx:-30px"></div>
+    <div class="hero-cloud" style="width:280px;height:140px;top:20%;left:60%;--hd:26s;--hx:20px"></div>
+    <div class="hero-content">
+      <div class="hero-kv">✦ Album Kỷ Niệm Cá Nhân ✦</div>
+      <h1 class="hero-title">
+        <span class="ht-sm">Những khoảnh khắc</span>
+        <span class="ht-lg">MEMORIES</span>
+        <span class="ht-sub">Lưu giữ mãi mãi</span>
+      </h1>
+      <p class="hero-desc">Ảnh &amp; video kỷ niệm của bạn, lưu trên Google Drive, xem được mọi nơi.</p>
+      <div id="admin-upload-wrap" style="display:none">
+        <label class="hero-upload">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          Thêm ảnh / video
+          <input type="file" multiple accept="image/*,video/*" onchange="handleFiles(this.files)">
+        </label>
+      </div>
+    </div>
+    <div class="scroll-hint"><div class="scroll-line"></div>Cuộn xuống</div>
+  </section>
+
+  <!-- GALLERY -->
+  <div id="gallery-section">
+    <!-- TOPNAV -->
+    <div class="topnav">
+      <div class="nav-brand">MEM<em>O</em>RIES</div>
+      <div id="admin-nav" style="display:none;align-items:center;gap:8px;flex-wrap:wrap">
+        <label class="nav-btn primary">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          Thêm ảnh/video
+          <input type="file" multiple accept="image/*,video/*" onchange="handleFiles(this.files)">
+        </label>
+        <button class="nav-btn danger" onclick="deleteAll()">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg>
+          Xóa tất cả
+        </button>
+      </div>
+      <div class="nav-sep"></div>
+      <div class="view-btns">
+        <button class="vb on" id="btnM" onclick="setView('masonry')">⊞</button>
+        <button class="vb" id="btnG" onclick="setView('grid')">⊟</button>
+      </div>
+    </div>
+
+    <!-- TABS -->
+    <div class="tab-bar">
+      <button class="tab-item on" id="tab-all" onclick="switchTab('all')">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        Tất cả <span class="t-badge" id="b-all">0</span>
+      </button>
+      <button class="tab-item" id="tab-photos" onclick="switchTab('photos')">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        Ảnh <span class="t-badge" id="b-photos">0</span>
+      </button>
+      <button class="tab-item" id="tab-videos" onclick="switchTab('videos')">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+        Video <span class="t-badge" id="b-videos">0</span>
+      </button>
+      <div class="tab-stats"><b id="t-count">0</b> mục</div>
+    </div>
+
+    <!-- GRIDS -->
+    <div class="masonry-wrap">
+      <div id="loading"><div class="spin"></div><div class="load-txt">Đang tải từ Google Drive...</div></div>
+      <div class="masonry" id="grid-all"></div>
+      <div class="masonry" id="grid-photos" style="display:none"></div>
+      <div class="masonry" id="grid-videos" style="display:none"></div>
+    </div>
+  </div>
+
+  <footer>✦ &nbsp; MEMORIES · Album 4K · Google Drive &nbsp; ✦</footer>
+</div>
+
+<!-- LIGHTBOX -->
+<div id="lb">
+  <div class="lb-top">
+    <div class="lb-counter"><b id="lb-cur">1</b> / <b id="lb-tot">1</b></div>
+    <button class="lb-close" onclick="closeLb()">✕ Đóng</button>
+  </div>
+  <div class="lb-main" id="lb-main"></div>
+  <div class="lb-info">
+    <div class="lb-n" id="lb-name"></div>
+    <div class="lb-d" id="lb-date"></div>
+    <div class="lb-actions">
+      <a id="lb-dl" href="#" target="_blank" rel="noopener" class="lb-action">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Tải ảnh gốc
+      </a>
+    </div>
+  </div>
+  <button class="lb-nav" id="lbn-p" onclick="lbNav(-1)">‹</button>
+  <button class="lb-nav" id="lbn-n" onclick="lbNav(1)">›</button>
+  <div class="lb-strip" id="lb-strip"></div>
+</div>
+<div id="toast"></div>
+
+<script>
+/* CONFIG — mật khẩu đã được mã hoá SHA-256, không thể đọc ngược lại */
+const CFG = {
+    ADMIN_HASH: 'deef2fb070f8e3f89de557d28a27d8e59d757cde4c0eaf2d530503b03f509857',
+  VIEW_HASH:  'deef2fb070f8e3f89de557d28a27d8e59d757cde4c0eaf2d530503b03f509857',
+  SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbxQl_wRslxYkjqQ6CBJqJgY1Myzvyj0jzIy5ZllQGOKtccIqk3IQXfQyAbvaYKQ5Pp60w/exec'
+};
+
+/* ═══ SKY CANVAS ═══ */
+(function(){
+  const cv = document.getElementById('sky-canvas');
+  const ctx = cv.getContext('2d');
+  let W, H;
+  const rsz = () => { W = cv.width = window.innerWidth; H = cv.height = window.innerHeight; };
+  rsz(); window.addEventListener('resize', rsz);
+
+  /* Sky gradient layers */
+  const SKY_COLS = [
+    [0,    '#1565c0'],
+    [0.25, '#1e88e5'],
+    [0.55, '#42a5f5'],
+    [0.78, '#90caf9'],
+    [0.92, '#bbdefb'],
+    [1,    '#e3f2fd'],
+  ];
+
+  /* Cloud objects */
+  class Cloud {
+    constructor(x, y, scale, speed, opacity) {
+      this.x = x; this.y = y; this.scale = scale;
+      this.speed = speed; this.opacity = opacity;
+      this.puffs = Array.from({length: 5 + Math.floor(Math.random()*4)}, () => ({
+        dx: (Math.random()-0.5)*180*scale,
+        dy: (Math.random()-0.3)*50*scale,
+        r:  (25 + Math.random()*45) * scale
+      }));
+    }
+    draw(ctx) {
+      ctx.save();
+      ctx.globalAlpha = this.opacity;
+      // shadow
+      ctx.shadowColor = 'rgba(100,160,220,0.18)';
+      ctx.shadowBlur = 12 * this.scale;
+      this.puffs.forEach(p => {
+        const g = ctx.createRadialGradient(this.x+p.dx, this.y+p.dy, 0, this.x+p.dx, this.y+p.dy, p.r);
+        g.addColorStop(0, 'rgba(255,255,255,0.97)');
+        g.addColorStop(0.6, 'rgba(240,248,255,0.88)');
+        g.addColorStop(1, 'rgba(200,230,255,0)');
+        ctx.beginPath();
+        ctx.arc(this.x+p.dx, this.y+p.dy, p.r, 0, Math.PI*2);
+        ctx.fillStyle = g; ctx.fill();
+      });
+      ctx.restore();
+    }
+    update() { this.x += this.speed; if (this.x > W + 300) this.x = -400; }
+  }
+
+  const clouds = [
+    new Cloud(W*0.1,  H*0.15, 1.4,  0.18, 0.82),
+    new Cloud(W*0.45, H*0.1,  1.0,  0.14, 0.72),
+    new Cloud(W*0.75, H*0.2,  1.2,  0.22, 0.78),
+    new Cloud(W*0.25, H*0.35, 0.8,  0.10, 0.55),
+    new Cloud(W*0.6,  H*0.3,  1.6,  0.16, 0.65),
+    new Cloud(W*0.85, H*0.08, 0.9,  0.20, 0.60),
+    new Cloud(-200,   H*0.42, 0.7,  0.12, 0.40),
+    new Cloud(W*1.1,  H*0.25, 1.1,  0.15, 0.50),
+  ];
+
+  /* Lens flare / light rays from sun */
+  const SUN_X = 0.88, SUN_Y = -0.05;
+
+  function drawSky() {
+    const g = ctx.createLinearGradient(0, 0, 0, H);
+    SKY_COLS.forEach(([stop, col]) => g.addColorStop(stop, col));
+    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+  }
+
+  function drawSun() {
+    const sx = W * SUN_X, sy = H * SUN_Y;
+    // main glow
+    const sg = ctx.createRadialGradient(sx, sy, 0, sx, sy, H*0.5);
+    sg.addColorStop(0,   'rgba(255,248,200,0.28)');
+    sg.addColorStop(0.15,'rgba(255,220,100,0.12)');
+    sg.addColorStop(0.4, 'rgba(255,180,50,0.05)');
+    sg.addColorStop(1,   'rgba(255,140,0,0)');
+    ctx.fillStyle = sg; ctx.fillRect(0, 0, W, H);
+    // light rays
+    ctx.save();
+    ctx.globalAlpha = 0.04;
+    for (let i = 0; i < 8; i++) {
+      const ang = (i / 8) * Math.PI * 2;
+      ctx.beginPath();
+      ctx.moveTo(sx, sy);
+      ctx.lineTo(sx + Math.cos(ang) * W * 1.5, sy + Math.sin(ang) * H * 2);
+      ctx.strokeStyle = 'rgba(255,230,120,1)';
+      ctx.lineWidth = 30;
+      ctx.stroke();
+    }
+    ctx.restore();
+    // sun disk
+    const sd = ctx.createRadialGradient(sx, sy, 0, sx, sy, 55);
+    sd.addColorStop(0, 'rgba(255,255,220,0.9)');
+    sd.addColorStop(0.4,'rgba(255,230,100,0.6)');
+    sd.addColorStop(1, 'rgba(255,180,40,0)');
+    ctx.fillStyle = sd; ctx.beginPath(); ctx.arc(sx, sy, 55, 0, Math.PI*2); ctx.fill();
+  }
+
+  /* Distant haze / horizon */
+  function drawHaze() {
+    const hg = ctx.createLinearGradient(0, H*0.6, 0, H);
+    hg.addColorStop(0, 'rgba(255,255,255,0)');
+    hg.addColorStop(0.5,'rgba(220,240,255,0.08)');
+    hg.addColorStop(1, 'rgba(200,230,255,0.18)');
+    ctx.fillStyle = hg; ctx.fillRect(0, H*0.6, W, H*0.4);
+  }
+
+  /* Tiny sparkle stars (for atmosphere) */
+  const sparkles = Array.from({length: 18}, () => ({
+    x: Math.random(), y: Math.random() * 0.45,
+    r: Math.random() * 1.2 + 0.4,
+    phase: Math.random() * Math.PI * 2,
+    spd: Math.random() * 1.5 + 0.5
+  }));
+
+  let t = 0;
+  function frame() {
+    ctx.clearRect(0, 0, W, H);
+    drawSky();
+    drawSun();
+    clouds.forEach(c => { c.update(); c.draw(ctx); });
+    drawHaze();
+    // atmospheric sparkles (dust motes in light)
+    sparkles.forEach(s => {
+      const op = 0.12 * (0.5 + 0.5 * Math.sin(t * s.spd + s.phase));
+      ctx.beginPath(); ctx.arc(s.x * W, s.y * H, s.r, 0, Math.PI*2);
+      ctx.fillStyle = 'rgba(255,255,220,' + op + ')'; ctx.fill();
+    });
+    t += 0.012;
+    requestAnimationFrame(frame);
+  }
+  frame();
+})();
+
+/* ═══ PASSWORD — so sánh SHA-256, không lưu mật khẩu gốc ═══ */
+const sha256 = async s => {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+};
+let IS_ADMIN = false;
+// Chống brute-force: giới hạn số lần thử
+let pwAttempts = 0;
+const MAX_ATTEMPTS = 5;
+let pwLocked = false;
+let pwLockTimer = null;
+
+async function checkPw() {
+  if (pwLocked) { document.getElementById('pw-err').textContent = 'Đã thử quá nhiều lần — chờ 30 giây'; return; }
+  const val = document.getElementById('pw-input').value.trim();
+  if (!val) return;
+  const h = await sha256(val);
+  if (h === CFG.ADMIN_HASH) {
+    pwAttempts = 0; IS_ADMIN = true; enterAlbum(true);
+  } else if (h === CFG.VIEW_HASH) {
+    pwAttempts = 0; IS_ADMIN = false; enterAlbum(false);
+  } else {
+    pwAttempts++;
+    const box = document.querySelector('.pw-card');
+    box.classList.remove('pw-shake'); void box.offsetWidth; box.classList.add('pw-shake');
+    document.getElementById('pw-input').value = '';
+    if (pwAttempts >= MAX_ATTEMPTS) {
+      pwLocked = true;
+      document.getElementById('pw-err').textContent = 'Sai ' + MAX_ATTEMPTS + ' lần — khóa 30 giây';
+      document.querySelector('.pw-btn').disabled = true;
+      document.querySelector('.pw-btn').style.opacity = '0.5';
+      pwLockTimer = setTimeout(() => {
+        pwLocked = false; pwAttempts = 0;
+        document.getElementById('pw-err').textContent = '';
+        document.querySelector('.pw-btn').disabled = false;
+        document.querySelector('.pw-btn').style.opacity = '1';
+      }, 30000);
+    } else {
+      document.getElementById('pw-err').textContent = 'Mật khẩu không đúng — còn ' + (MAX_ATTEMPTS - pwAttempts) + ' lần thử';
+    }
+  }
+}
+document.getElementById('pw-input').addEventListener('keydown', e => { if(e.key==='Enter') checkPw(); });
+
+function enterAlbum(isAdmin) {
+  document.getElementById('pw-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  if (isAdmin) {
+    document.getElementById('admin-upload-wrap').style.display = 'block';
+    document.getElementById('admin-nav').style.display = 'flex';
+    setupDragDrop();
+  }
+  loadViaJsonp();
+}
+
+/* ═══ DRIVE — JSONP LOAD ═══ */
+let allMedia = [], lbIdx = 0, curView = 'masonry', curTab = 'all';
+
+function loadViaJsonp() {
+  document.getElementById('loading').style.display = 'block';
+  const cb = 'cb_' + Date.now();
+  window[cb] = function(data) {
+    document.getElementById('loading').style.display = 'none';
+    delete window[cb];
+    const s = document.getElementById('_jsonp'); if(s) s.remove();
+    if (data && data.items) {
+      allMedia = data.items.map(item => ({
+        id: item.id, name: item.name, date: item.date||'', type: item.type||'image',
+        url: 'https://drive.google.com/thumbnail?id=' + item.id + '&sz=w2048',
+        viewUrl: 'https://drive.google.com/file/d/' + item.id + '/view'
+      }));
+      render();
+      toast('Đã tải <span class="thi">' + allMedia.length + '</span> mục từ Drive');
+    } else { render(); if(IS_ADMIN) toast('Album trống — hãy thêm ảnh!'); }
+  };
+  const sc = document.createElement('script'); sc.id = '_jsonp';
+  sc.src = CFG.SCRIPT_URL + '?action=list&callback=' + cb;
+  sc.onerror = () => { document.getElementById('loading').style.display='none'; render(); toast('<span class="terr">Không thể tải từ Drive</span>'); };
+  document.head.appendChild(sc);
+}
+
+/* ═══ DRIVE — UPLOAD ═══ */
+async function handleFiles(files) {
+  if (!IS_ADMIN) return;
+  const arr = Array.from(files).filter(f => f.type.startsWith('image/')||f.type.startsWith('video/'));
+  if (!arr.length) return;
+  const bar = document.getElementById('prog');
+  toast('Đang upload <span class="thi">' + arr.length + '</span> file...');
+  let done = 0;
+  for (const file of arr) {
+    const src = await new Promise(res => { const r=new FileReader(); r.onload=e=>res(e.target.result); r.readAsDataURL(file); });
+    const isVid = file.type.startsWith('video/');
+    const ext = isVid?'.mp4':(file.type.includes('png')?'.png':file.type.includes('gif')?'.gif':'.jpg');
+    try {
+      await fetch(CFG.SCRIPT_URL, {
+        method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain'},
+        body: JSON.stringify({ action:'upload', base64:src.split(',')[1], mimeType:file.type,
+          filename: file.name.replace(/\.[^.]+$/,'')+ext, type:isVid?'video':'image' })
+      });
+    } catch(e){}
+    done++; bar.style.width = (done/arr.length*100)+'%';
+  }
+  setTimeout(()=>bar.style.width='0%',600);
+  toast('<span class="tok">✓ Upload xong!</span> Đang tải lại...');
+  setTimeout(loadViaJsonp, 2000);
+}
+
+/* ═══ DRIVE — DELETE ═══ */
+async function deleteItem(e, id) {
+  e.stopPropagation(); if(!IS_ADMIN||!confirm('Xóa ảnh này?'))return;
+  await fetch(CFG.SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'delete',fileId:id})});
+  toast('Đã xóa — đang tải lại...'); setTimeout(loadViaJsonp, 1500);
+}
+async function deleteAll() {
+  if(!IS_ADMIN||!confirm('Xóa TẤT CẢ?'))return;
+  await fetch(CFG.SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'deleteAll'})});
+  toast('Đã xóa tất cả'); setTimeout(loadViaJsonp, 2000);
+}
+
+/* ═══ RENDER ═══ */
+function makeCard(item, gi) {
+  const isVid = item.type === 'video';
+  let media;
+  if (isVid) {
+    const esc = item.name.replace(/'/g,"\\'").substring(0,22)+(item.name.length>22?'...':'');
+    media = '<div class="vid-thumb-wrap">'
+      +'<img src="'+item.url+'" loading="lazy" style="width:100%;height:auto;display:block"'
+      +' onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">'
+      +'<div class="vid-placeholder" style="display:none">'
+      +'<svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="1.2"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>'
+      +'<span>'+esc+'</span></div>'
+      +'<div class="vid-play-icon"><svg viewBox="0 0 48 48" width="48" height="48"><circle cx="24" cy="24" r="24" fill="rgba(13,35,64,0.55)"/><polygon points="19,14 38,24 19,34" fill="white"/></svg></div>'
+      +'</div>';
+  } else {
+    media = '<img src="'+item.url+'" alt="'+item.name+'" loading="lazy" style="display:block;width:100%;height:auto"'
+      +' onerror="this.src=\'https://drive.google.com/thumbnail?id='+item.id+'&sz=w800\'">';
+  }
+  const del = IS_ADMIN ? '<div class="c-top"><button class="c-del" onclick="deleteItem(event,\''+item.id+'\')">✕</button></div>' : '';
+  const caption = '<div class="c-caption"><div class="c-cap-name">'+item.name+'</div><div class="c-cap-date">'+item.date+(isVid?' · <span style="color:var(--teal);font-size:9px;font-weight:600">VIDEO</span>':'')+'</div></div>';
+  return '<div class="card'+(isVid?' is-vid':'')+'" style="animation-delay:'+Math.min(gi,24)*.04+'s" onclick="openLb('+gi+')">'
+    +media+del
+    +'<div class="c-ov"><div class="c-name">'+item.name+'</div><div class="c-date">'+item.date+'</div></div>'
+    +caption+'</div>';
+}
+
+function emptyHTML(msg){
+  return '<div class="empty" style="column-span:all;grid-column:1/-1">'
+    +'<div class="empty-icon">☁️</div>'
+    +'<h3>Chưa có nội dung</h3><p>'+msg+'</p></div>';
+}
+
+function render(){
+  const imgs=allMedia.filter(m=>m.type!=='video'), vids=allMedia.filter(m=>m.type==='video');
+  document.getElementById('t-count').textContent=allMedia.length;
+  document.getElementById('b-all').textContent=allMedia.length;
+  document.getElementById('b-photos').textContent=imgs.length;
+  document.getElementById('b-videos').textContent=vids.length;
+  document.getElementById('grid-all').innerHTML=allMedia.length?allMedia.map((m,i)=>makeCard(m,i)).join(''):emptyHTML(IS_ADMIN?'Kéo thả ảnh/video vào đây để upload':'Album chưa có ảnh nào');
+  document.getElementById('grid-photos').innerHTML=imgs.length?imgs.map(m=>makeCard(m,allMedia.indexOf(m))).join(''):emptyHTML('Chưa có ảnh');
+  document.getElementById('grid-videos').innerHTML=vids.length?vids.map(m=>makeCard(m,allMedia.indexOf(m))).join(''):emptyHTML('Chưa có video');
+  setView(curView); switchTab(curTab);
+}
+
+function switchTab(t){
+  curTab=t;
+  ['all','photos','videos'].forEach(x=>{
+    document.getElementById('tab-'+x).classList.toggle('on',x===t);
+    document.getElementById('grid-'+x).style.display=x===t?'block':'none';
+  });
+}
+
+function setView(v){
+  curView=v;
+  ['all','photos','videos'].forEach(x=>{
+    document.getElementById('grid-'+x).className=v==='masonry'?'masonry':'grid-view';
+  });
+  document.getElementById('btnM').classList.toggle('on',v==='masonry');
+  document.getElementById('btnG').classList.toggle('on',v==='grid');
+}
+
+/* ═══ DRAG DROP ═══ */
+function setupDragDrop(){
+  const dz=document.getElementById('dz');
+  document.addEventListener('dragenter',e=>{e.preventDefault();dz.classList.add('show')},{passive:false});
+  document.addEventListener('dragover',e=>{e.preventDefault();e.dataTransfer.dropEffect='copy'},{passive:false});
+  document.addEventListener('dragleave',e=>{if(e.clientX<=0||e.clientY<=0||e.clientX>=window.innerWidth||e.clientY>=window.innerHeight)dz.classList.remove('show')});
+  document.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('show');if(e.dataTransfer.files&&e.dataTransfer.files.length)handleFiles(e.dataTransfer.files)},{passive:false});
+  dz.addEventListener('dragover',e=>e.preventDefault(),{passive:false});
+  dz.addEventListener('drop',e=>{e.preventDefault();e.stopPropagation();dz.classList.remove('show');if(e.dataTransfer.files&&e.dataTransfer.files.length)handleFiles(e.dataTransfer.files)},{passive:false});
+}
+
+/* ═══ LIGHTBOX ═══ */
+function openLb(i){lbIdx=i;updateLb();document.getElementById('lb').classList.add('open');document.body.style.overflow='hidden'}
+function updateLb(){
+  const m=allMedia[lbIdx];
+  const main=document.getElementById('lb-main');
+  main.querySelectorAll('img,video,iframe').forEach(el=>el.remove());
+  let el;
+  if(m.type==='video'){
+    el=document.createElement('iframe');
+    el.src='https://drive.google.com/file/d/'+m.id+'/preview';
+    el.allow='autoplay'; el.style.opacity='0';
+    el.onload=()=>{el.style.transition='opacity .3s';el.style.opacity='1'};
+  } else {
+    el=document.createElement('img'); el.src=m.url; el.alt=m.name;
+    el.style.opacity='0'; el.onload=()=>{el.style.transition='opacity .3s';el.style.opacity='1'};
+  }
+  main.appendChild(el);
+  document.getElementById('lb-name').textContent=m.name;
+  document.getElementById('lb-date').textContent=m.date+(m.type==='video'?' · VIDEO':'');
+  document.getElementById('lb-cur').textContent=lbIdx+1;
+  document.getElementById('lb-tot').textContent=allMedia.length;
+  const dl=document.getElementById('lb-dl');
+  if(m.type==='video'){dl.href='https://drive.google.com/file/d/'+m.id+'/view';dl.innerHTML='<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg> Xem trên Drive';}
+  else{dl.href='https://drive.google.com/uc?export=download&id='+m.id;dl.innerHTML='<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Tải ảnh gốc 4K';}
+  const strip=document.getElementById('lb-strip');
+  strip.innerHTML=allMedia.map((x,i)=>'<img class="lbt'+(i===lbIdx?' on':'')+'" src="'+x.url+'" onclick="lbGo('+i+')">').join('');
+  strip.querySelector('.lbt.on')?.scrollIntoView({block:'nearest',inline:'center',behavior:'smooth'});
+}
+function lbNav(d){const main=document.getElementById('lb-main');main.querySelector('video')?.pause();const ifr=main.querySelector('iframe');if(ifr)ifr.src='';lbIdx=(lbIdx+d+allMedia.length)%allMedia.length;updateLb()}
+function lbGo(i){const main=document.getElementById('lb-main');main.querySelector('video')?.pause();const ifr=main.querySelector('iframe');if(ifr)ifr.src='';lbIdx=i;updateLb()}
+function closeLb(){const main=document.getElementById('lb-main');main.querySelector('video')?.pause();const ifr=main.querySelector('iframe');if(ifr)ifr.src='';document.getElementById('lb').classList.remove('open');document.body.style.overflow=''}
+document.getElementById('lb').addEventListener('click',e=>{if(e.target===document.getElementById('lb'))closeLb()});
+document.addEventListener('keydown',e=>{if(!document.getElementById('lb').classList.contains('open'))return;if(e.key==='Escape')closeLb();if(e.key==='ArrowLeft')lbNav(-1);if(e.key==='ArrowRight')lbNav(1)});
+
+/* ═══ ANTI-INSPECT (ngăn xem nguồn dễ) ═══ */
+document.addEventListener('contextmenu', e => e.preventDefault());
+document.addEventListener('keydown', e => {
+  // Chặn F12, Ctrl+U, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C
+  if (e.key === 'F12' ||
+      (e.ctrlKey && e.key === 'u') ||
+      (e.ctrlKey && e.shiftKey && ['i','j','c'].includes(e.key.toLowerCase()))) {
+    e.preventDefault(); return false;
+  }
+});
+// Phát hiện DevTools mở (kỹ thuật cơ bản)
+setInterval(() => {
+  const t = performance.now();
+  debugger;
+  if (performance.now() - t > 100) { document.body.innerHTML = ''; location.reload(); }
+}, 3000);
+
+/* ═══ TOAST ═══ */
+let _tt;
+function toast(msg){const t=document.getElementById('toast');t.innerHTML=msg;t.classList.add('show');clearTimeout(_tt);_tt=setTimeout(()=>t.classList.remove('show'),3500)}
+</script>
+</body>
+</html>
