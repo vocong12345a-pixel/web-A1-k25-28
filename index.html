@@ -75,7 +75,6 @@ body{background:var(--sky1);color:var(--text);font-family:'Nunito',sans-serif;fo
 .sort-bar label{font-weight:600;letter-spacing:.06em;text-transform:uppercase;font-size:10px}
 .sort-sel{background:rgba(13,35,64,.05);border:1.5px solid rgba(13,35,64,.1);border-radius:8px;padding:4px 10px;font-family:'Nunito',sans-serif;font-size:11px;color:var(--text);cursor:pointer;outline:none;transition:border-color .2s}
 .sort-sel:focus{border-color:var(--teal)}
-/* RENAME MODAL */
 #rename-modal{display:none;position:fixed;inset:0;z-index:20000;background:rgba(4,14,30,.82);backdrop-filter:blur(16px);align-items:center;justify-content:center}
 #rename-modal.open{display:flex}
 .rm-card{background:white;border-radius:18px;padding:30px 32px;max-width:380px;width:90%;box-shadow:0 24px 60px rgba(13,35,64,.28)}
@@ -358,7 +357,7 @@ footer{text-align:center;padding:30px 24px 46px;background:rgba(255,255,255,.4);
 var CFG = {
   ADMIN_HASH: 'af579db5437912b7e0c0794b02c00a7ce6e80d448cc48567bddfa0a32c528656',
   VIEW_HASH:  '2eaf63d50128c5614c345c409f13a5de7e841d79fbc9d0d19dab3c50a8e7503e',
-  SCRIPT_URL:'https://script.google.com/macros/s/AKfycbyh0P3voAByJDR7tANOOzkLFHP4jtRWZ9CtsCcXGcNkTEwGYWdm6QlG5gZIGN_vjcreX/exec'
+  SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbyh0P3voAByJDR7tANOOzkLFHP4jtRWZ9CtsCcXGcNkTEwGYWdm6QlG5gZIGN_vjcreX/exec'
 };
 
 /* ══════════════════════════════════════
@@ -683,10 +682,11 @@ function makeCard(item, gi) {
     media = '<img class="photo" src="' + item.cardUrl + '" alt="' + item.name + '" loading="lazy"'
       + ' onerror="if(!this.f1){this.f1=1;this.src=\'' + item.fallUrl + '\';}">';
   }
-  var safeName2 = item.name.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
   var del = IS_ADMIN
     ? '<div class="c-top">'
-      + '<button class="c-del" title="Đổi tên" style="font-size:12px;margin-right:4px" onclick="openRename(event,\'' + item.id + '\',\'' + safeName2 + '\')">✏️</button>'
+      + '<button class="c-del" title="Đổi tên" style="font-size:13px;margin-right:4px"'
+      + ' data-rid="' + item.id + '" data-rname="' + item.name.replace(/&/g,'&amp;').replace(/"/g,'&quot;') + '"'
+      + ' onclick="openRenameBtn(event,this)">✏️</button>'
       + '<button class="c-del" onclick="deleteItem(event,\'' + item.id + '\')">✕</button>'
       + '</div>'
     : '';
@@ -713,7 +713,6 @@ function emptyHTML(msg) {
    SORT
 ══════════════════════════════════════ */
 function parseDate(str) {
-  // Format: DD/MM/YYYY or DD/MM/YYYY HH:MM
   if (!str) return 0;
   var parts = str.split(' ');
   var d = parts[0].split('/');
@@ -740,15 +739,21 @@ function applySort() {
 ══════════════════════════════════════ */
 var _renameId = null;
 
-function openRename(e, id, currentName) {
+function openRenameBtn(e, btn) {
   e.stopPropagation();
   if (!IS_ADMIN) return;
+  var id   = btn.getAttribute('data-rid');
+  var name = btn.getAttribute('data-rname');
   _renameId = id;
-  document.getElementById('rm-old').textContent = 'Tên hiện tại: ' + currentName;
-  document.getElementById('rm-input').value = currentName.replace(/\.[^.]+$/, '');
+  document.getElementById('rm-old').textContent = 'Tên hiện tại: ' + name;
+  document.getElementById('rm-input').value = name.replace(/\.[^.]+$/, '');
   document.getElementById('rm-save').disabled = false;
+  document.getElementById('rm-save').textContent = 'Lưu vào Drive';
   document.getElementById('rename-modal').classList.add('open');
-  setTimeout(function(){ document.getElementById('rm-input').focus(); document.getElementById('rm-input').select(); }, 50);
+  setTimeout(function(){
+    document.getElementById('rm-input').focus();
+    document.getElementById('rm-input').select();
+  }, 50);
 }
 
 function closeRename() {
@@ -778,8 +783,9 @@ document.getElementById('rename-modal').addEventListener('click', function(e) {
   if (e.target === this) closeRename();
 });
 document.addEventListener('keydown', function(e) {
-  if (document.getElementById('rename-modal').classList.contains('open') && e.key === 'Escape') closeRename();
-  if (document.getElementById('rename-modal').classList.contains('open') && e.key === 'Enter') saveRename();
+  if (!document.getElementById('rename-modal').classList.contains('open')) return;
+  if (e.key === 'Escape') closeRename();
+  if (e.key === 'Enter') saveRename();
 });
 
 function render() {
