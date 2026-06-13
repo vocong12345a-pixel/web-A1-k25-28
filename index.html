@@ -71,6 +71,25 @@ body{background:var(--sky1);color:var(--text);font-family:'Nunito',sans-serif;fo
 .tab-item:not(.on) .tbadge{background:rgba(13,35,64,.07);color:var(--faint)}
 .tab-stats{margin-left:auto;font-size:11px;color:var(--faint);padding:13px 4px;white-space:nowrap}
 .tab-stats b{color:var(--sky1);font-weight:600}
+.sort-bar{display:flex;align-items:center;gap:8px;padding:8px 18px;background:rgba(255,255,255,.52);border-bottom:1px solid rgba(255,255,255,.75);font-size:11px;color:var(--muted)}
+.sort-bar label{font-weight:600;letter-spacing:.06em;text-transform:uppercase;font-size:10px}
+.sort-sel{background:rgba(13,35,64,.05);border:1.5px solid rgba(13,35,64,.1);border-radius:8px;padding:4px 10px;font-family:'Nunito',sans-serif;font-size:11px;color:var(--text);cursor:pointer;outline:none;transition:border-color .2s}
+.sort-sel:focus{border-color:var(--teal)}
+/* RENAME MODAL */
+#rename-modal{display:none;position:fixed;inset:0;z-index:20000;background:rgba(4,14,30,.82);backdrop-filter:blur(16px);align-items:center;justify-content:center}
+#rename-modal.open{display:flex}
+.rm-card{background:white;border-radius:18px;padding:30px 32px;max-width:380px;width:90%;box-shadow:0 24px 60px rgba(13,35,64,.28)}
+.rm-title{font-family:'Cormorant Garamond',serif;font-size:1.25rem;font-weight:400;color:var(--text);margin-bottom:6px}
+.rm-sub{font-size:11px;color:var(--muted);margin-bottom:18px}
+.rm-input{width:100%;border:1.5px solid rgba(13,35,64,.15);border-radius:10px;padding:11px 14px;font-family:'Nunito',sans-serif;font-size:14px;color:var(--text);outline:none;transition:border-color .2s;margin-bottom:14px}
+.rm-input:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(8,145,178,.1)}
+.rm-btns{display:flex;gap:9px}
+.rm-btn{flex:1;padding:11px;border:none;border-radius:10px;font-family:'Nunito',sans-serif;font-size:12px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;cursor:pointer;transition:all .2s}
+.rm-btn.cancel{background:rgba(13,35,64,.07);color:var(--muted)}
+.rm-btn.cancel:hover{background:rgba(13,35,64,.12)}
+.rm-btn.save{background:linear-gradient(135deg,var(--sky1),var(--teal));color:white;box-shadow:0 4px 14px rgba(8,145,178,.28)}
+.rm-btn.save:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(8,145,178,.38)}
+.rm-btn.save:disabled{opacity:.5;transform:none;cursor:not-allowed}
 
 /* HERO */
 .hero{min-height:88vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:80px 24px 60px;position:relative}
@@ -275,6 +294,16 @@ footer{text-align:center;padding:30px 24px 46px;background:rgba(255,255,255,.4);
       <div class="tab-stats"><b id="t-count">0</b> mục</div>
     </div>
 
+    <div class="sort-bar">
+      <label>Sắp xếp:</label>
+      <select class="sort-sel" id="sort-sel" onchange="applySort()">
+        <option value="date-desc">Mới nhất trước</option>
+        <option value="date-asc">Cũ nhất trước</option>
+        <option value="name-asc">Tên A → Z</option>
+        <option value="name-desc">Tên Z → A</option>
+      </select>
+    </div>
+
     <div class="masonry-wrap">
       <div id="loading"><div class="spin"></div><div class="load-txt">Đang tải từ Google Drive...</div></div>
       <div class="masonry" id="grid-all"></div>
@@ -307,6 +336,19 @@ footer{text-align:center;padding:30px 24px 46px;background:rgba(255,255,255,.4);
   <button class="lb-nav" id="lbn-n" onclick="lbNav(1)">›</button>
   <div class="lb-strip" id="lb-strip"></div>
 </div>
+
+<!-- RENAME MODAL -->
+<div id="rename-modal">
+  <div class="rm-card">
+    <div class="rm-title">✏️ Đổi tên ảnh</div>
+    <div class="rm-sub" id="rm-old"></div>
+    <input class="rm-input" id="rm-input" type="text" placeholder="Nhập tên mới...">
+    <div class="rm-btns">
+      <button class="rm-btn cancel" onclick="closeRename()">Hủy</button>
+      <button class="rm-btn save" id="rm-save" onclick="saveRename()">Lưu vào Drive</button>
+    </div>
+  </div>
+</div>
 <div id="toast"></div>
 
 <script>
@@ -316,7 +358,7 @@ footer{text-align:center;padding:30px 24px 46px;background:rgba(255,255,255,.4);
 var CFG = {
   ADMIN_HASH: 'af579db5437912b7e0c0794b02c00a7ce6e80d448cc48567bddfa0a32c528656',
   VIEW_HASH:  '2eaf63d50128c5614c345c409f13a5de7e841d79fbc9d0d19dab3c50a8e7503e',
-  SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbwMrxVOi703vafDiMa4rvit5idH9AGqnvknqF4CJb8mOhOwkkhF60EFKiotQ0-EZe2umA/exec'
+  SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbyL3a3zn-WZp17R_BHAxK4rKjdkk9bwsSNAO4w8Ya4iScYoHxK0_VhSsf8Nzxnx0gci3g/exec'
 };
 
 /* ══════════════════════════════════════
@@ -528,7 +570,7 @@ function loadViaJsonp() {
           dlUrl:   'https://drive.google.com/uc?export=download&id=' + id
         };
       });
-      render();
+      applySort();
       toast('Đã tải <span class="thi">' + allMedia.length + '</span> mục từ Drive');
     } else {
       render();
@@ -641,8 +683,12 @@ function makeCard(item, gi) {
     media = '<img class="photo" src="' + item.cardUrl + '" alt="' + item.name + '" loading="lazy"'
       + ' onerror="if(!this.f1){this.f1=1;this.src=\'' + item.fallUrl + '\';}">';
   }
+  var safeName2 = item.name.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
   var del = IS_ADMIN
-    ? '<div class="c-top"><button class="c-del" onclick="deleteItem(event,\'' + item.id + '\')">✕</button></div>'
+    ? '<div class="c-top">'
+      + '<button class="c-del" title="Đổi tên" style="font-size:12px;margin-right:4px" onclick="openRename(event,\'' + item.id + '\',\'' + safeName2 + '\')">✏️</button>'
+      + '<button class="c-del" onclick="deleteItem(event,\'' + item.id + '\')">✕</button>'
+      + '</div>'
     : '';
   var caption = '<div class="c-caption">'
     + '<div class="c-cap-name">' + item.name + '</div>'
@@ -662,6 +708,79 @@ function emptyHTML(msg) {
     + '<div class="empty-icon">☁️</div>'
     + '<h3>Chưa có nội dung</h3><p>' + msg + '</p></div>';
 }
+
+/* ══════════════════════════════════════
+   SORT
+══════════════════════════════════════ */
+function parseDate(str) {
+  // Format: DD/MM/YYYY or DD/MM/YYYY HH:MM
+  if (!str) return 0;
+  var parts = str.split(' ');
+  var d = parts[0].split('/');
+  if (d.length < 3) return 0;
+  var t = parts[1] ? parts[1].split(':') : [0,0];
+  return new Date(d[2], d[1]-1, d[0], t[0]||0, t[1]||0).getTime();
+}
+
+function applySort() {
+  var sel = document.getElementById('sort-sel');
+  var v = sel ? sel.value : 'date-desc';
+  allMedia.sort(function(a, b) {
+    if (v === 'date-desc') return parseDate(b.date) - parseDate(a.date);
+    if (v === 'date-asc')  return parseDate(a.date) - parseDate(b.date);
+    if (v === 'name-asc')  return a.name.localeCompare(b.name, 'vi');
+    if (v === 'name-desc') return b.name.localeCompare(a.name, 'vi');
+    return 0;
+  });
+  render();
+}
+
+/* ══════════════════════════════════════
+   RENAME
+══════════════════════════════════════ */
+var _renameId = null;
+
+function openRename(e, id, currentName) {
+  e.stopPropagation();
+  if (!IS_ADMIN) return;
+  _renameId = id;
+  document.getElementById('rm-old').textContent = 'Tên hiện tại: ' + currentName;
+  document.getElementById('rm-input').value = currentName.replace(/\.[^.]+$/, '');
+  document.getElementById('rm-save').disabled = false;
+  document.getElementById('rename-modal').classList.add('open');
+  setTimeout(function(){ document.getElementById('rm-input').focus(); document.getElementById('rm-input').select(); }, 50);
+}
+
+function closeRename() {
+  document.getElementById('rename-modal').classList.remove('open');
+  _renameId = null;
+}
+
+function saveRename() {
+  if (!_renameId) return;
+  var newName = document.getElementById('rm-input').value.trim();
+  if (!newName) { toast('<span class="terr">Tên không được để trống</span>'); return; }
+  var btn = document.getElementById('rm-save');
+  btn.disabled = true;
+  btn.textContent = 'Đang lưu...';
+  fetch(CFG.SCRIPT_URL, {
+    method: 'POST', mode: 'no-cors',
+    headers: { 'Content-Type': 'text/plain' },
+    body: JSON.stringify({ action: 'rename', fileId: _renameId, newName: newName })
+  }).catch(function(){}).finally(function() {
+    closeRename();
+    toast('<span class="tok">✓ Đã đổi tên — đang tải lại...</span>');
+    setTimeout(loadViaJsonp, 1800);
+  });
+}
+
+document.getElementById('rename-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeRename();
+});
+document.addEventListener('keydown', function(e) {
+  if (document.getElementById('rename-modal').classList.contains('open') && e.key === 'Escape') closeRename();
+  if (document.getElementById('rename-modal').classList.contains('open') && e.key === 'Enter') saveRename();
+});
 
 function render() {
   var imgs = allMedia.filter(function(m) { return m.type !== 'video'; });
