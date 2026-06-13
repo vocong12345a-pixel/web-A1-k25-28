@@ -528,7 +528,7 @@ function enterAlbum(isAdmin) {
 }
 
 /* ══════════════════════════════════════
-   DRIVE — LOAD VIA JSONP
+   DRIVE — LẤY DỮ LIỆU (ĐÃ ĐỔI TỪ JSONP SANG FETCH CORS)
 ══════════════════════════════════════ */
 var allMedia = [];
 var lbIdx = 0;
@@ -537,54 +537,53 @@ var curTab = 'all';
 
 function loadViaJsonp() {
   document.getElementById('loading').style.display = 'block';
-  var cb = 'cb_' + Date.now();
-  window[cb] = function(data) {
-    document.getElementById('loading').style.display = 'none';
-    delete window[cb];
-    var s = document.getElementById('_jsonp');
-    if (s) s.remove();
-    if (data && data.items) {
-      allMedia = data.items.map(function(item) {
-        var id = item.id;
-        var isVid = item.type === 'video';
-        return {
-          id:      id,
-          name:    item.name,
-          date:    item.date || '',
-          type:    item.type || 'image',
-          // Ảnh: lh3 = chất lượng gốc, không nén
-          // Video: thumbnail Drive
-          cardUrl: isVid
-            ? ('https://drive.google.com/thumbnail?id=' + id + '&sz=w800')
-            : ('https://lh3.googleusercontent.com/d/' + id + '=s1600'),
-          // Lightbox: full resolution
-          fullUrl: isVid
-            ? null
-            : ('https://lh3.googleusercontent.com/d/' + id + '=s0'),
-          // Fallback nếu lh3 không load
-          fallUrl: 'https://drive.google.com/thumbnail?id=' + id + '&sz=w1600',
-          // Strip thumbnail nhỏ
-          thumbUrl: 'https://drive.google.com/thumbnail?id=' + id + '&sz=w200',
-          viewUrl: 'https://drive.google.com/file/d/' + id + '/view',
-          dlUrl:   'https://drive.google.com/uc?export=download&id=' + id
-        };
-      });
-      applySort();
-      toast('Đã tải <span class="thi">' + allMedia.length + '</span> mục từ Drive');
-    } else {
+
+  // Dùng Fetch chuẩn CORS thay cho JSONP
+  fetch(CFG.SCRIPT_URL + '?action=list', {
+      method: 'GET',
+      mode: 'cors',
+      redirect: 'follow'
+  })
+  .then(function(response) {
+      if (!response.ok) throw new Error('Network response was not ok');
+      return response.json();
+  })
+  .then(function(data) {
+      document.getElementById('loading').style.display = 'none';
+      if (data && data.items) {
+        allMedia = data.items.map(function(item) {
+          var id = item.id;
+          var isVid = item.type === 'video';
+          return {
+            id:      id,
+            name:    item.name,
+            date:    item.date || '',
+            type:    item.type || 'image',
+            cardUrl: isVid
+              ? ('https://drive.google.com/thumbnail?id=' + id + '&sz=w800')
+              : ('https://lh3.googleusercontent.com/d/' + id + '=s1600'),
+            fullUrl: isVid
+              ? null
+              : ('https://lh3.googleusercontent.com/d/' + id + '=s0'),
+            fallUrl: 'https://drive.google.com/thumbnail?id=' + id + '&sz=w1600',
+            thumbUrl: 'https://drive.google.com/thumbnail?id=' + id + '&sz=w200',
+            viewUrl: 'https://drive.google.com/file/d/' + id + '/view',
+            dlUrl:   'https://drive.google.com/uc?export=download&id=' + id
+          };
+        });
+        applySort();
+        toast('Đã tải <span class="thi">' + allMedia.length + '</span> mục từ Drive');
+      } else {
+        render();
+        if (IS_ADMIN) toast('Album trống — hãy thêm ảnh!');
+      }
+  })
+  .catch(function(error) {
+      document.getElementById('loading').style.display = 'none';
       render();
-      if (IS_ADMIN) toast('Album trống — hãy thêm ảnh!');
-    }
-  };
-  var sc = document.createElement('script');
-  sc.id = '_jsonp';
-  sc.src = CFG.SCRIPT_URL + '?action=list&callback=' + cb;
-  sc.onerror = function() {
-    document.getElementById('loading').style.display = 'none';
-    render();
-    toast('<span class="terr">Không thể tải — kiểm tra Script URL</span>');
-  };
-  document.head.appendChild(sc);
+      toast('<span class="terr">Không thể tải — kiểm tra Script URL</span>');
+      console.error('Fetch Error:', error);
+  });
 }
 
 /* ══════════════════════════════════════
@@ -614,9 +613,12 @@ function handleFiles(files) {
     var reader = new FileReader();
     reader.onload = function(e) {
       var base64 = e.target.result.split(',')[1];
+      
+      // Đã đổi mode: 'cors' và thêm redirect: 'follow'
       fetch(CFG.SCRIPT_URL, {
         method: 'POST',
-        mode: 'no-cors',
+        mode: 'cors',
+        redirect: 'follow', 
         headers: { 'Content-Type': 'text/plain' },
         body: JSON.stringify({
           action: 'upload',
@@ -625,7 +627,10 @@ function handleFiles(files) {
           filename: fname,
           type: isVid ? 'video' : 'image'
         })
-      }).catch(function(){}).finally(function() {
+      })
+      .then(function(res) { return res.json(); })
+      .catch(function(err) { console.error('Upload Error:', err); })
+      .finally(function() {
         done++;
         bar.style.width = (done / arr.length * 100) + '%';
         uploadNext(i + 1);
@@ -642,22 +647,36 @@ function handleFiles(files) {
 function deleteItem(e, id) {
   e.stopPropagation();
   if (!IS_ADMIN || !confirm('Xóa ảnh này?')) return;
+  
+  // Đã đổi mode: 'cors' và thêm redirect: 'follow'
   fetch(CFG.SCRIPT_URL, {
-    method: 'POST', mode: 'no-cors',
+    method: 'POST', 
+    mode: 'cors',
+    redirect: 'follow',
     headers: { 'Content-Type': 'text/plain' },
     body: JSON.stringify({ action: 'delete', fileId: id })
-  }).catch(function(){});
+  })
+  .then(function(res) { return res.json(); })
+  .catch(function(err) { console.error('Delete Error:', err); });
+  
   toast('Đã xóa — đang tải lại...');
   setTimeout(loadViaJsonp, 1500);
 }
 
 function deleteAll() {
   if (!IS_ADMIN || !confirm('Xóa TẤT CẢ?')) return;
+  
+  // Đã đổi mode: 'cors' và thêm redirect: 'follow'
   fetch(CFG.SCRIPT_URL, {
-    method: 'POST', mode: 'no-cors',
+    method: 'POST', 
+    mode: 'cors',
+    redirect: 'follow',
     headers: { 'Content-Type': 'text/plain' },
     body: JSON.stringify({ action: 'deleteAll' })
-  }).catch(function(){});
+  })
+  .then(function(res) { return res.json(); })
+  .catch(function(err) { console.error('DeleteAll Error:', err); });
+  
   toast('Đã xóa tất cả');
   setTimeout(loadViaJsonp, 2000);
 }
@@ -685,7 +704,7 @@ function makeCard(item, gi) {
   var del = IS_ADMIN
     ? '<div class="c-top">'
       + '<button class="c-del" title="Đổi tên" style="font-size:13px;margin-right:4px"'
-      + ' data-rid="' + item.id + '" data-rname="' + item.name.replace(/&/g,'&amp;').replace(/"/g,'&quot;') + '"'
+      + ' data-rid="' + item.id + '" data-rname="' + item.name.replace(/&/g,'&').replace(/"/g,'"') + '"'
       + ' onclick="openRenameBtn(event,this)">✏️</button>'
       + '<button class="c-del" onclick="deleteItem(event,\'' + item.id + '\')">✕</button>'
       + '</div>'
@@ -768,11 +787,18 @@ function saveRename() {
   var btn = document.getElementById('rm-save');
   btn.disabled = true;
   btn.textContent = 'Đang lưu...';
+  
+  // Đã đổi mode: 'cors' và thêm redirect: 'follow'
   fetch(CFG.SCRIPT_URL, {
-    method: 'POST', mode: 'no-cors',
+    method: 'POST', 
+    mode: 'cors',
+    redirect: 'follow',
     headers: { 'Content-Type': 'text/plain' },
     body: JSON.stringify({ action: 'rename', fileId: _renameId, newName: newName })
-  }).catch(function(){}).finally(function() {
+  })
+  .then(function(res) { return res.json(); })
+  .catch(function(err) { console.error('Rename Error:', err); })
+  .finally(function() {
     closeRename();
     toast('<span class="tok">✓ Đã đổi tên — đang tải lại...</span>');
     setTimeout(loadViaJsonp, 1800);
